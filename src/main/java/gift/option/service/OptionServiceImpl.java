@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-@Transactional(readOnly = true)
 public class OptionServiceImpl implements OptionService {
 
     private final OptionRepository optionRepository;
@@ -30,6 +29,7 @@ public class OptionServiceImpl implements OptionService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<OptionResponseDto> getOptions(Long productId) {
         return optionRepository.findByProductId(productId).stream()
                 .map(OptionResponseDto::from)
