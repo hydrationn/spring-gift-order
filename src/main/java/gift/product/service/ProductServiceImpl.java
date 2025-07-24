@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
@@ -44,7 +45,6 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Page<ProductResponseDto> findAllProducts(Pageable pageable) {
         return productRepository.findAll(pageable)
                 .map(ProductResponseDto::from);
@@ -52,7 +52,6 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
-    @Transactional(readOnly = true)
     public ProductResponseDto findProductById(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));
