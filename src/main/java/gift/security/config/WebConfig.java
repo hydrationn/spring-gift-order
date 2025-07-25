@@ -16,11 +16,6 @@ public class WebConfig implements WebMvcConfigurer {
     private final JwtProvider jwtProvider;
     private final MemberService memberService;
 
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
-
     public WebConfig(JwtProvider jwtProvider, MemberService memberService) {
         this.jwtProvider = jwtProvider;
         this.memberService = memberService;
