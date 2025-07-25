@@ -23,12 +23,13 @@ public class KakaoOAuthService {
     @Value("${kakao.redirect-uri}")
     private String redirectUri;
 
+    @Value("${kakao.token-url}")
+    private String tokenUrl;
+
     private final RestTemplate restTemplate;
 
-    private static final String TOKEN_URL = "https://kauth.kakao.com/oauth/token";
-
     public KakaoTokenResponse requestAccessToken(String authorizationCode) {
-        String url = TOKEN_URL;
+        URI tokenUri = URI.create(tokenUrl);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
@@ -39,12 +40,10 @@ public class KakaoOAuthService {
         body.add("redirect_uri", redirectUri);
         body.add("code", authorizationCode);
 
-        RequestEntity<MultiValueMap<String, String>> request = new RequestEntity<>(
-                body,
-                headers,
-                HttpMethod.POST,
-                URI.create(url)
-        );
+        RequestEntity<MultiValueMap<String, String>> request = RequestEntity
+                .post(tokenUri)
+                .headers(headers)
+                .body(body);
 
         try {
             ResponseEntity<KakaoTokenResponse> response =
