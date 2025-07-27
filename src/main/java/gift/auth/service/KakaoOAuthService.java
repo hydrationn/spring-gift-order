@@ -1,0 +1,88 @@
+package gift.auth.service;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import gift.auth.dto.KakaoErrorResponseDto;
+import gift.auth.dto.KakaoTokenResponse;
+import gift.auth.exception.KakaoAuthException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
+import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestTemplate;
+
+import java.io.IOException;
+import java.net.URI;
+
+@Service
+@RequiredArgsConstructor
+public class KakaoOAuthService {
+
+    @Value("${kakao.client-id}")
+    private String clientId;
+
+    @Value("${kakao.redirect-uri}")
+    private String redirectUri;
+
+    @Value("${kakao.token-url}")
+    private String tokenUrl;
+
+    private final RestTemplate restTemplate;
+
+    private final ObjectMapper objectMapper;
+
+    public KakaoTokenResponse requestAccessToken(String authorizationCode) {
+        URI tokenUri = URI.create(tokenUrl);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("grant_type", "authorization_code");
+        body.add("client_id", clientId);
+        body.add("redirect_uri", redirectUri);
+        body.add("code", authorizationCode);
+
+        RequestEntity<MultiValueMap<String, String>> request = RequestEntity
+                .post(tokenUri)
+                .headers(headers)
+                .body(body);
+
+        try {
+            ResponseEntity<KakaoTokenResponse> response =
+                    restTemplate.exchange(request, KakaoTokenResponse.class);
+            return response.getBody();
+        } catch (HttpStatusCodeException e) {
+            String json = e.getResponseBodyAsString();
+            KakaoErrorResponseDto kakaoErrorResponseDto;
+            try {
+                kakaoErrorResponseDto = objectMapper.readValue(json, KakaoErrorResponseDto.class);
+            } catch (IOException io) {
+                throw new KakaoAuthException("카카오 에러 바디 파싱 실패", e);
+            }
+
+            switch (kakaoErrorResponseDto.getError()) {
+                case "invalid_request":
+                    throw new KakaoAuthException("잘못된 파라미터입니다. : " + kakaoErrorResponseDto.getErrorDescription());
+                case "invalid_client":
+                    throw new KakaoAuthException("앱 키가 올바르지 않습니다. 설정을 확인하세요. ");
+                case "invalid_grant":
+                    throw new KakaoAuthException("인가 코드가 만료되었거나 잘못되었습니다. 다시 로그인해주세요. ");
+                case "invalid_scope":
+                    throw new KakaoAuthException("잘못된 동의 항목 ID입니다. ");
+                case "misconfigured":
+                    throw new KakaoAuthException("플랫폼 설정이 올바르지 않습니다. 카카오 개발자 콘솔을 확인하세요. ");
+                case "access_denied":
+                    throw new KakaoAuthException("사용자가 로그인/동의를 취소했습니다.");
+                case "server_error":
+                    throw new KakaoAuthException("카카오 서버 오류입니다. 잠시 후 다시 시도해주세요. ");
+                default:
+                    throw new KakaoAuthException(
+                            "카카오 토큰 요청 실패: " + kakaoErrorResponseDto.getError() + " / " + kakaoErrorResponseDto.getErrorDescription()
+                    );
+            }
+        }
+    }
+}

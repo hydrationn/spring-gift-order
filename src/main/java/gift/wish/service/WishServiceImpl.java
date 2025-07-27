@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class WishServiceImpl implements WishService {
     private final WishRepository wishRepository;
     private final ProductRepository productRepository;
@@ -52,7 +53,6 @@ public class WishServiceImpl implements WishService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Page<WishResponseDto> findAllWishesByMemberId(Long memberId, Pageable pageable) {
         Page<Wish> page = wishRepository.findAllByMemberId(memberId, pageable);
 
