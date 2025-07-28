@@ -73,7 +73,8 @@ class KakaoOAuthServiceTest {
         server.verify();
     }
 
-    @Test @DisplayName("invalid_request 에러: 잘못된 파라미터 예외가 발생한다. ")
+    @Test
+    @DisplayName("invalid_request 에러: 잘못된 파라미터 예외가 발생한다. ")
     void error_invalidRequest() {
         performErrorTest(
                 "invalid_request",
@@ -83,7 +84,8 @@ class KakaoOAuthServiceTest {
         );
     }
 
-    @Test @DisplayName("invalid_client 에러: 앱 키 오류 예외가 발생한다. ")
+    @Test
+    @DisplayName("invalid_client 에러: 앱 키 오류 예외가 발생한다. ")
     void error_invalidClient() {
         performErrorTest(
                 "invalid_client",
@@ -93,7 +95,8 @@ class KakaoOAuthServiceTest {
         );
     }
 
-    @Test @DisplayName("invalid_grant 에러: 인가 코드 만료/오류 예외가 발생한다. ")
+    @Test
+    @DisplayName("invalid_grant 에러: 인가 코드 만료/오류 예외가 발생한다. ")
     void error_invalidGrant() {
         performErrorTest(
                 "invalid_grant",
@@ -103,7 +106,8 @@ class KakaoOAuthServiceTest {
         );
     }
 
-    @Test @DisplayName("invalid_scope 에러: 잘못된 동의 항목 예외가 발생한다. ")
+    @Test
+    @DisplayName("invalid_scope 에러: 잘못된 동의 항목 예외가 발생한다. ")
     void error_invalidScope() {
         performErrorTest(
                 "invalid_scope",
@@ -113,7 +117,8 @@ class KakaoOAuthServiceTest {
         );
     }
 
-    @Test @DisplayName("misconfigured 에러: 플랫폼 설정 불일치 예외가 발생한다. ")
+    @Test
+    @DisplayName("misconfigured 에러: 플랫폼 설정 불일치 예외가 발생한다. ")
     void error_misconfigured() {
         performErrorTest(
                 "misconfigured",
@@ -123,7 +128,8 @@ class KakaoOAuthServiceTest {
         );
     }
 
-    @Test @DisplayName("access_denied 에러: 사용자 취소 예외가 발생한다. ")
+    @Test
+    @DisplayName("access_denied 에러: 사용자 취소 예외가 발생한다. ")
     void error_accessDenied() {
         performErrorTest(
                 "access_denied",
@@ -133,7 +139,8 @@ class KakaoOAuthServiceTest {
         );
     }
 
-    @Test @DisplayName("server_error 에러: 카카오 서버 오류 예외가 발생한다. ")
+    @Test
+    @DisplayName("server_error 에러: 카카오 서버 오류 예외가 발생한다. ")
     void error_serverError() {
         performErrorTest(
                 "server_error",
@@ -143,7 +150,8 @@ class KakaoOAuthServiceTest {
         );
     }
 
-    @Test @DisplayName("알 수 없는 에러 코드: 기본 에러 메시지 예외가 발생한다. ")
+    @Test
+    @DisplayName("알 수 없는 에러 코드: 기본 에러 메시지 예외가 발생한다. ")
     void error_unknown() {
         performErrorTest(
                 "error",
@@ -153,7 +161,8 @@ class KakaoOAuthServiceTest {
         );
     }
 
-    @Test @DisplayName("에러 바디 JSON 파싱 실패 시 카카오 에러 파싱 예외가 발생한다. ")
+    @Test
+    @DisplayName("에러 바디 JSON 파싱 실패 시 카카오 에러 파싱 예외가 발생한다. ")
     void error_parsingFailure() {
         commonExpect("any")
                 .andRespond(withBadRequest()
