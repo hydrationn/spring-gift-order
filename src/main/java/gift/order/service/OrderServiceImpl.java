@@ -47,6 +47,8 @@ public class OrderServiceImpl implements OrderService {
         Option opt = optionRepository.findById(dto.optionId())
                 .orElseThrow(() -> new OptionNotFoundException(dto.optionId()));
 
+        opt.decreaseStock(dto.quantity());
+
         Order order = new Order(opt, dto.quantity(), LocalDateTime.now(), dto.message());
         orderRepository.save(order);
 

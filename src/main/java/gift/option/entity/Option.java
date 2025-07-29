@@ -1,5 +1,6 @@
 package gift.option.entity;
 
+import gift.order.exception.OutOfStockException;
 import gift.product.entity.Product;
 import jakarta.persistence.*;
 
@@ -58,5 +59,12 @@ public class Option {
 
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    public void decreaseStock(int count) {
+        if (this.quantity < count) {
+            throw new OutOfStockException(this.quantity);
+        }
+        this.quantity -= count;
     }
 }
