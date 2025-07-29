@@ -35,11 +35,11 @@ public class OrderController {
 
     @GetMapping
     public Page<OrderResponseDto> listOrders(
-            @LoginMember Long loginUserId,
+            @LoginMember AuthenticatedMemberDto loginMember,
             @PageableDefault(page = 0, size = 10, sort = "orderDateTime", direction = Sort.Direction.DESC)
             Pageable pageable
     ) {
-        return orderService.listOrders(loginUserId, pageable);
+        return orderService.listOrders(loginMember.id(), pageable);
     }
 }
 
