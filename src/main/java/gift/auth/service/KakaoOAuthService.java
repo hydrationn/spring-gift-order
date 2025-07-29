@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import gift.auth.dto.KakaoErrorResponseDto;
 import gift.auth.dto.KakaoTokenResponse;
 import gift.auth.exception.KakaoAuthException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -17,7 +16,6 @@ import java.io.IOException;
 import java.net.URI;
 
 @Service
-@RequiredArgsConstructor
 public class KakaoOAuthService {
 
     @Value("${kakao.client-id}")
@@ -32,6 +30,11 @@ public class KakaoOAuthService {
     private final RestTemplate restTemplate;
 
     private final ObjectMapper objectMapper;
+
+    public KakaoOAuthService(RestTemplate restTemplate, ObjectMapper objectMapper) {
+        this.restTemplate = restTemplate;
+        this.objectMapper = objectMapper;
+    }
 
     public KakaoTokenResponse requestAccessToken(String authorizationCode) {
         URI tokenUri = URI.create(tokenUrl);
