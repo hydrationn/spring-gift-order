@@ -21,6 +21,9 @@ public class Member {
     @Column(nullable = false)
     private Role role;
 
+    @Column(name = "kakao_access_token")
+    private String kakaoAccessToken;
+
     protected Member() {}
 
     public Member(String name, String email, String password, Role role) {
@@ -58,6 +61,10 @@ public class Member {
         return role;
     }
 
+    public String getKakaoAccessToken() {
+        return kakaoAccessToken;
+    }
+
     public void update(String name, String email, String password) {
         this.name = name;
         this.email = email;
@@ -66,5 +73,9 @@ public class Member {
 
     public boolean isPasswordMatch(String password) {
         return this.password.equals(password);
+    }
+
+    public void updateKakaoToken(String kakaoAccessToken) {
+        this.kakaoAccessToken = kakaoAccessToken;
     }
 }

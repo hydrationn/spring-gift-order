@@ -27,6 +27,9 @@ public class KakaoOAuthService {
     @Value("${kakao.token-url}")
     private String tokenUrl;
 
+    @Value("${kakao.profile-url}")
+    private String profileUrl;
+
     private final RestTemplate restTemplate;
 
     private final ObjectMapper objectMapper;
@@ -87,5 +90,20 @@ public class KakaoOAuthService {
                     );
             }
         }
+    }
+
+    public String requestRawUserInfo(String accessToken) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        HttpEntity<Void> req = new HttpEntity<>(headers);
+        ResponseEntity<String> resp = restTemplate.exchange(
+                URI.create(profileUrl),
+                HttpMethod.GET,
+                req,
+                String.class
+        );
+        return resp.getBody();
     }
 }

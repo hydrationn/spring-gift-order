@@ -99,4 +99,18 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new MemberNotFoundException(id));
         memberRepository.delete(member);
     }
+
+    @Override
+    public Member registerOrUpdate(String email, String name, String kakaoAccessToken) {
+        return memberRepository.findByEmail(email)
+                .map(member -> {
+                    member.updateKakaoToken(kakaoAccessToken);
+                    return member;
+                })
+                .orElseGet(() -> {
+                    Member m = new Member(null, name, email, "", Role.USER);
+                    m.updateKakaoToken(kakaoAccessToken);
+                    return memberRepository.save(m);
+                });
+    }
 }

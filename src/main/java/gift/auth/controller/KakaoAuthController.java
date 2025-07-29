@@ -1,24 +1,33 @@
 package gift.auth.controller;
 
-import gift.auth.dto.KakaoTokenResponse;
-import gift.auth.service.KakaoOAuthService;
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import gift.auth.dto.AuthTokenResponseDto;
+import gift.auth.service.AuthService;
+import gift.member.service.MemberService;
+import gift.security.config.JwtProvider;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequiredArgsConstructor
 public class KakaoAuthController {
 
-    private final KakaoOAuthService kakaoOAuthService;
+    private final AuthService authService;
+    private final MemberService memberService;
+    private final JwtProvider jwtProvider;
+
+    public KakaoAuthController(AuthService authService, MemberService memberService, JwtProvider jwtProvider) {
+        this.authService = authService;
+        this.memberService = memberService;
+        this.jwtProvider = jwtProvider;
+    }
 
     @GetMapping(value = "/", params = "code")
-    public ResponseEntity<KakaoTokenResponse> callback(
+    public ResponseEntity<AuthTokenResponseDto> kakaoLogin(
             @RequestParam("code") String authorizationCode
-    ) {
-        KakaoTokenResponse token = kakaoOAuthService.requestAccessToken(authorizationCode);
-        return ResponseEntity.ok(token);
+    ) throws JsonProcessingException {
+        AuthTokenResponseDto response = authService.loginWithKakao(authorizationCode);
+        return ResponseEntity.ok(response);
     }
 }
