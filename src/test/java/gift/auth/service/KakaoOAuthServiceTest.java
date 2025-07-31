@@ -68,7 +68,7 @@ class KakaoOAuthServiceTest {
 
         assertThat(resp.getAccessToken()).isEqualTo("access123");
         assertThat(resp.getRefreshToken()).isEqualTo("refresh123");
-        assertThat(resp.getExpiresAt()).isEqualTo(12345678);
+        assertThat(resp.getExpiresIn().getEpochSecond()).isEqualTo(12345678);
 
         server.verify();
     }
