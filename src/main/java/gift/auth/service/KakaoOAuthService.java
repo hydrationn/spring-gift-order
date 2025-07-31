@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gift.auth.dto.KakaoErrorResponseDto;
-import gift.auth.dto.KakaoTokenResponse;
+import gift.auth.entity.KakaoToken;
 import gift.auth.dto.KakaoUserResponseDto;
 import gift.auth.exception.KakaoAuthException;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,7 +42,7 @@ public class KakaoOAuthService {
         this.objectMapper = objectMapper;
     }
 
-    public KakaoTokenResponse requestAccessToken(String authorizationCode) {
+    public KakaoToken requestAccessToken(String authorizationCode) {
         URI tokenUri = URI.create(tokenUrl);
 
         HttpHeaders headers = new HttpHeaders();
@@ -60,8 +60,8 @@ public class KakaoOAuthService {
                 .body(body);
 
         try {
-            ResponseEntity<KakaoTokenResponse> response =
-                    restTemplate.exchange(request, KakaoTokenResponse.class);
+            ResponseEntity<KakaoToken> response =
+                    restTemplate.exchange(request, KakaoToken.class);
             return response.getBody();
         } catch (HttpStatusCodeException e) {
             String json = e.getResponseBodyAsString();

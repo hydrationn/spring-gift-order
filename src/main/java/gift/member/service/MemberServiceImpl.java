@@ -101,15 +101,14 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Member registerOrUpdate(String email, String name, String kakaoAccessToken) {
+    public Member registerOrUpdate(String email, String name) {
         return memberRepository.findByEmail(email)
-                .map(member -> {
-                    member.updateKakaoToken(kakaoAccessToken);
-                    return member;
+                .map(m -> {
+                    m.updateName(name);
+                    return m;
                 })
                 .orElseGet(() -> {
                     Member m = new Member(null, name, email, "", Role.USER);
-                    m.updateKakaoToken(kakaoAccessToken);
                     return memberRepository.save(m);
                 });
     }

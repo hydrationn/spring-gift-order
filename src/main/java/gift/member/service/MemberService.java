@@ -12,5 +12,5 @@ public interface MemberService {
     MemberResponseDto findMemberById(Long id);
     void updateMember(Long id, MemberUpdateRequestDto memberUpdateRequestDto);
     void deleteMember(Long id);
-    Member registerOrUpdate(String email, String nickname, String kakaoAccessToken);
+    Member registerOrUpdate(String email, String nickname);
 }

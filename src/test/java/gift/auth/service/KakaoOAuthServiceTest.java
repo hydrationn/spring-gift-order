@@ -1,7 +1,7 @@
 package gift.auth.service;
 
 import gift.auth.config.ApiClientConfig;
-import gift.auth.dto.KakaoTokenResponse;
+import gift.auth.entity.KakaoToken;
 import gift.auth.exception.KakaoAuthException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -64,11 +64,11 @@ class KakaoOAuthServiceTest {
         commonExpect("auth-code")
                 .andRespond(withSuccess(body, MediaType.APPLICATION_JSON));
 
-        KakaoTokenResponse resp = service.requestAccessToken("auth-code");
+        KakaoToken resp = service.requestAccessToken("auth-code");
 
         assertThat(resp.getAccessToken()).isEqualTo("access123");
         assertThat(resp.getRefreshToken()).isEqualTo("refresh123");
-        assertThat(resp.getExpiresIn()).isEqualTo(12345678);
+        assertThat(resp.getExpiresAt()).isEqualTo(12345678);
 
         server.verify();
     }

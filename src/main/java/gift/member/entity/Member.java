@@ -1,5 +1,6 @@
 package gift.member.entity;
 
+import gift.auth.entity.KakaoToken;
 import jakarta.persistence.*;
 
 @Entity
@@ -21,8 +22,8 @@ public class Member {
     @Column(nullable = false)
     private Role role;
 
-    @Column(name = "kakao_access_token")
-    private String kakaoAccessToken;
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private KakaoToken kakaoToken;
 
     protected Member() {}
 
@@ -61,8 +62,12 @@ public class Member {
         return role;
     }
 
-    public String getKakaoAccessToken() {
-        return kakaoAccessToken;
+    public KakaoToken getKakaoToken() {
+        return kakaoToken;
+    }
+
+    public void updateName(String name) {
+        this.name = name;
     }
 
     public void update(String name, String email, String password) {
@@ -75,7 +80,10 @@ public class Member {
         return this.password.equals(password);
     }
 
-    public void updateKakaoToken(String kakaoAccessToken) {
-        this.kakaoAccessToken = kakaoAccessToken;
+    public void setKakaoToken(KakaoToken kakaoToken) {
+        this.kakaoToken = kakaoToken;
+        if (kakaoToken.getMember() != this) {
+            kakaoToken.linkMember(this);
+        }
     }
 }

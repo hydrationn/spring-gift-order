@@ -41,7 +41,6 @@ public class KakaoMessageServiceImpl implements KakaoMessageService {
                 "주문이 완료되었습니다!",
                 String.format("주문번호: %d, 옵션: %s, 수량: %d",
                         order.getId(),
-                        order.getOrderDateTime(),
                         order.getOption().getName(),
                         order.getQuantity()
                 ),

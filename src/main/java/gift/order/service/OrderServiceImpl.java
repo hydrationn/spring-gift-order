@@ -56,7 +56,7 @@ public class OrderServiceImpl implements OrderService {
 
         String accessToken = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(memberId))
-                .getKakaoAccessToken();
+                .getKakaoToken().getAccessToken();
         kakaoMessageService.sendOrderMemo(accessToken, order);
 
         return new OrderResponseDto(
