@@ -9,8 +9,10 @@ import gift.option.repository.OptionRepository;
 import gift.order.dto.OrderRequestDto;
 import gift.order.dto.OrderResponseDto;
 import gift.order.entity.Order;
+import gift.order.event.OrderCreatedEvent;
 import gift.order.repository.OrderRepository;
 import gift.wish.repository.WishRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,20 +27,20 @@ public class OrderServiceImpl implements OrderService {
     private final OptionRepository optionRepository;
     private final OrderRepository orderRepository;
     private final WishRepository wishRepository;
-    private final KakaoMessageService kakaoMessageService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public OrderServiceImpl(
             MemberRepository memberRepository,
             OptionRepository optionRepository,
             OrderRepository orderRepository,
             WishRepository wishRepository,
-            KakaoMessageService kakaoMessageService
+            ApplicationEventPublisher applicationEventPublisher
     ) {
         this.memberRepository = memberRepository;
         this.optionRepository = optionRepository;
         this.orderRepository = orderRepository;
         this.wishRepository = wishRepository;
-        this.kakaoMessageService = kakaoMessageService;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     @Override
@@ -54,10 +56,7 @@ public class OrderServiceImpl implements OrderService {
 
         wishRepository.deleteByOption(opt);
 
-        String accessToken = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberNotFoundException(memberId))
-                .getKakaoToken().getAccessToken();
-        kakaoMessageService.sendOrderMemo(accessToken, order);
+        applicationEventPublisher.publishEvent(new OrderCreatedEvent(memberId, order));
 
         return new OrderResponseDto(
                 order.getId(),
