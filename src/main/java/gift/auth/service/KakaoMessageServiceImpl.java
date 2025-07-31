@@ -14,9 +14,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.format.DateTimeFormatter;
-import java.util.Map;
-
 @Service
 public class KakaoMessageServiceImpl implements KakaoMessageService {
     private final RestTemplate restTemplate;

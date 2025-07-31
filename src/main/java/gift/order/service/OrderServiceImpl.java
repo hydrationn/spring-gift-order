@@ -1,8 +1,5 @@
 package gift.order.service;
 
-import gift.auth.service.KakaoMessageService;
-import gift.member.exception.MemberNotFoundException;
-import gift.member.repository.MemberRepository;
 import gift.option.entity.Option;
 import gift.option.exception.OptionNotFoundException;
 import gift.option.repository.OptionRepository;
@@ -23,20 +20,17 @@ import java.time.LocalDateTime;
 @Service
 @Transactional(readOnly = true)
 public class OrderServiceImpl implements OrderService {
-    private final MemberRepository memberRepository;
     private final OptionRepository optionRepository;
     private final OrderRepository orderRepository;
     private final WishRepository wishRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     public OrderServiceImpl(
-            MemberRepository memberRepository,
             OptionRepository optionRepository,
             OrderRepository orderRepository,
             WishRepository wishRepository,
             ApplicationEventPublisher applicationEventPublisher
     ) {
-        this.memberRepository = memberRepository;
         this.optionRepository = optionRepository;
         this.orderRepository = orderRepository;
         this.wishRepository = wishRepository;
