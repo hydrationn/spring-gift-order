@@ -1,6 +1,8 @@
 package gift.order.event.listener;
 
 import gift.auth.service.KakaoMessageService;
+import gift.member.entity.Member;
+import gift.member.exception.MemberNotFoundException;
 import gift.member.repository.MemberRepository;
 import gift.order.event.OrderCreatedEvent;
 import org.springframework.scheduling.annotation.Async;
@@ -21,7 +23,11 @@ public class KakaoOrderListener {
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onOrderCreated(OrderCreatedEvent event) {
-        String token = String.valueOf(memberRepository.findById(event.memberId()).get().getKakaoToken());
-        kakaoMessageService.sendOrderMemo(token, event.order());
+        Member member = memberRepository.findById(event.memberId())
+                .orElseThrow(() -> new MemberNotFoundException(event.memberId()));
+
+        String accessToken = member.getKakaoToken().getAccessToken();
+
+        kakaoMessageService.sendOrderMemo(accessToken, event.order());
     }
 }
