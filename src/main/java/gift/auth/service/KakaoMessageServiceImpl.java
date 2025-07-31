@@ -2,6 +2,9 @@ package gift.auth.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import gift.auth.dto.KakaoContent;
+import gift.auth.dto.KakaoFeedRequestDto;
+import gift.auth.dto.KakaoLink;
 import gift.order.entity.Order;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -11,6 +14,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 @Service
@@ -33,18 +37,21 @@ public class KakaoMessageServiceImpl implements KakaoMessageService {
         headers.setBearerAuth(accessToken);
         headers.setContentType(MediaType.valueOf("application/x-www-form-urlencoded;charset=UTF-8"));
 
-        var content = Map.of(
-                "title",  "주문이 완료되었습니다!",
-                "description", "주문번호: " + order.getId(),
-                "link", Map.of(
-                        "web_url",  "http://localhost:8080/orders/" + order.getId(),
-                        "mobile_web_url", "http://localhost:8080/orders/" + order.getId()
+        KakaoContent content = new KakaoContent(
+                "주문이 완료되었습니다!",
+                String.format("주문번호: %d, 옵션: %s, 수량: %d",
+                        order.getId(),
+                        order.getOrderDateTime(),
+                        order.getOption().getName(),
+                        order.getQuantity()
+                ),
+                new KakaoLink(
+                        "http://localhost:8080/orders/" + order.getId(),
+                        "http://localhost:8080/orders/" + order.getId()
                 )
         );
-        var feed = Map.of(
-                "object_type", "feed",
-                "content",  content
-        );
+
+        KakaoFeedRequestDto feed = new KakaoFeedRequestDto("feed", content);
 
         String templateObject;
         try {
