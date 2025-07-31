@@ -1,8 +1,11 @@
 package gift.auth.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gift.auth.dto.KakaoErrorResponseDto;
 import gift.auth.dto.KakaoTokenResponse;
+import gift.auth.dto.KakaoUserResponseDto;
 import gift.auth.exception.KakaoAuthException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -92,18 +95,26 @@ public class KakaoOAuthService {
         }
     }
 
-    public String requestRawUserInfo(String accessToken) {
+    public KakaoUserResponseDto requestUserInfo(String accessToken) throws JsonProcessingException {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        HttpEntity<Void> req = new HttpEntity<>(headers);
-        ResponseEntity<String> resp = restTemplate.exchange(
-                URI.create(profileUrl),
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                profileUrl,
                 HttpMethod.GET,
-                req,
+                request,
                 String.class
         );
-        return resp.getBody();
+
+        String json = response.getBody();
+
+        JsonNode root = objectMapper.readTree(json);
+        String email    = root.path("kakao_account").path("email").asText();
+        String nickname = root.path("properties").path("nickname").asText();
+
+        return new KakaoUserResponseDto(email, nickname);
     }
 }
