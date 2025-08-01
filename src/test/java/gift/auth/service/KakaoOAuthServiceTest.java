@@ -13,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.ResponseActions;
 import org.springframework.test.web.client.response.DefaultResponseCreator;
@@ -30,6 +31,10 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 @RestClientTest(KakaoOAuthService.class)
 @Import(ApiClientConfig.class)
+@TestPropertySource(properties = {
+        "kakao.client-id=test-client",
+        "kakao.redirect-uri=http://localhost:8080"
+})
 class KakaoOAuthServiceTest {
 
     private static final String TOKEN_URL    = "https://kauth.kakao.com/oauth/token";
