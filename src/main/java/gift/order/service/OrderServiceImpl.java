@@ -39,7 +39,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderResponseDto createOrder(Long memberId, OrderRequestDto dto) {
+    public OrderResponseDto createOrder(Long memberId, OrderRequestDto dto, String accessToken) {
         Option opt = optionRepository.findById(dto.optionId())
                 .orElseThrow(() -> new OptionNotFoundException(dto.optionId()));
 
@@ -50,7 +50,8 @@ public class OrderServiceImpl implements OrderService {
 
         wishRepository.deleteByOption(opt);
 
-        applicationEventPublisher.publishEvent(new OrderCreatedEvent(memberId, order));
+        System.out.println("✅ 주문 성공");
+        applicationEventPublisher.publishEvent(new OrderCreatedEvent(memberId, order, accessToken));
 
         return new OrderResponseDto(
                 order.getId(),
