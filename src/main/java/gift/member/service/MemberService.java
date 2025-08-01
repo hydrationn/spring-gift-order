@@ -1,6 +1,7 @@
 package gift.member.service;
 
 import gift.member.dto.*;
+import gift.member.entity.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -11,4 +12,5 @@ public interface MemberService {
     MemberResponseDto findMemberById(Long id);
     void updateMember(Long id, MemberUpdateRequestDto memberUpdateRequestDto);
     void deleteMember(Long id);
+    Member registerOrUpdate(String email, String nickname);
 }

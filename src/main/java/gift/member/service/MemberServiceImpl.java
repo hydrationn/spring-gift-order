@@ -99,4 +99,17 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new MemberNotFoundException(id));
         memberRepository.delete(member);
     }
+
+    @Override
+    public Member registerOrUpdate(String email, String name) {
+        return memberRepository.findByEmail(email)
+                .map(m -> {
+                    m.updateName(name);
+                    return m;
+                })
+                .orElseGet(() -> {
+                    Member m = new Member(null, name, email, "", Role.USER);
+                    return memberRepository.save(m);
+                });
+    }
 }

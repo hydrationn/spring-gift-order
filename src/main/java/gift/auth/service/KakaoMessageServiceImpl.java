@@ -1,0 +1,73 @@
+package gift.auth.service;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import gift.auth.dto.KakaoContent;
+import gift.auth.dto.KakaoFeedRequestDto;
+import gift.auth.dto.KakaoLink;
+import gift.order.entity.Order;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
+import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestTemplate;
+
+@Service
+public class KakaoMessageServiceImpl implements KakaoMessageService {
+    private final RestTemplate restTemplate;
+
+    private final ObjectMapper objectMapper;
+
+    @Value("${kakao.api.memo-url}")
+    private String memoUrl;
+
+    public KakaoMessageServiceImpl(RestTemplate restTemplate, ObjectMapper objectMapper) {
+        this.restTemplate = restTemplate;
+        this.objectMapper = objectMapper;
+    }
+
+    @Override
+    public void sendOrderMemo(String accessToken, Order order) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        headers.setContentType(MediaType.valueOf("application/x-www-form-urlencoded;charset=UTF-8"));
+
+        KakaoContent content = new KakaoContent(
+                "주문이 완료되었습니다!",
+                String.format("주문번호: %d, 옵션: %s, 수량: %d",
+                        order.getId(),
+                        order.getOption().getName(),
+                        order.getQuantity()
+                ),
+                new KakaoLink(
+                        "http://localhost:8080/orders/" + order.getId(),
+                        "http://localhost:8080/orders/" + order.getId()
+                )
+        );
+
+        KakaoFeedRequestDto feed = new KakaoFeedRequestDto("feed", content);
+
+        String templateObject;
+        try {
+            templateObject = objectMapper.writeValueAsString(feed);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("카카오 메시지 JSON 변환 실패", e);
+        }
+
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("template_object", templateObject);
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.postForEntity(memoUrl, request, String.class);
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                throw new RuntimeException("카카오톡 API 호출 실패: " + response.getStatusCode());
+            }
+        } catch (HttpStatusCodeException e) {
+            throw new RuntimeException("카카오톡 API 호출 실패: " + e.getStatusCode(), e);
+        }
+    }
+}

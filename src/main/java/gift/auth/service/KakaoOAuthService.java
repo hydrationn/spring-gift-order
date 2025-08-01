@@ -1,10 +1,12 @@
 package gift.auth.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gift.auth.dto.KakaoErrorResponseDto;
-import gift.auth.dto.KakaoTokenResponse;
+import gift.auth.entity.KakaoToken;
+import gift.auth.dto.KakaoUserResponseDto;
 import gift.auth.exception.KakaoAuthException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -17,7 +19,6 @@ import java.io.IOException;
 import java.net.URI;
 
 @Service
-@RequiredArgsConstructor
 public class KakaoOAuthService {
 
     @Value("${kakao.client-id}")
@@ -29,11 +30,19 @@ public class KakaoOAuthService {
     @Value("${kakao.token-url}")
     private String tokenUrl;
 
+    @Value("${kakao.profile-url}")
+    private String profileUrl;
+
     private final RestTemplate restTemplate;
 
     private final ObjectMapper objectMapper;
 
-    public KakaoTokenResponse requestAccessToken(String authorizationCode) {
+    public KakaoOAuthService(RestTemplate restTemplate, ObjectMapper objectMapper) {
+        this.restTemplate = restTemplate;
+        this.objectMapper = objectMapper;
+    }
+
+    public KakaoToken requestAccessToken(String authorizationCode) {
         URI tokenUri = URI.create(tokenUrl);
 
         HttpHeaders headers = new HttpHeaders();
@@ -51,8 +60,8 @@ public class KakaoOAuthService {
                 .body(body);
 
         try {
-            ResponseEntity<KakaoTokenResponse> response =
-                    restTemplate.exchange(request, KakaoTokenResponse.class);
+            ResponseEntity<KakaoToken> response =
+                    restTemplate.exchange(request, KakaoToken.class);
             return response.getBody();
         } catch (HttpStatusCodeException e) {
             String json = e.getResponseBodyAsString();
@@ -84,5 +93,28 @@ public class KakaoOAuthService {
                     );
             }
         }
+    }
+
+    public KakaoUserResponseDto requestUserInfo(String accessToken) throws JsonProcessingException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                profileUrl,
+                HttpMethod.GET,
+                request,
+                String.class
+        );
+
+        String json = response.getBody();
+
+        JsonNode root = objectMapper.readTree(json);
+        String email    = root.path("kakao_account").path("email").asText();
+        String nickname = root.path("properties").path("nickname").asText();
+
+        return new KakaoUserResponseDto(email, nickname);
     }
 }
