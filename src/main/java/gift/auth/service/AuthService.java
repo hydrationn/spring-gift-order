@@ -29,6 +29,7 @@ public class AuthService {
         );
 
         String jwt = jwtProvider.generateToken(member);
-        return new AuthTokenResponseDto(jwt);
+
+        return new AuthTokenResponseDto(jwt, kakaoToken.accessToken());
     }
 }

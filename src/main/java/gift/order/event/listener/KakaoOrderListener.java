@@ -18,8 +18,6 @@ public class KakaoOrderListener {
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onOrderCreated(OrderCreatedEvent event) {
-        System.out.println("✅ 주문 성공 후 메시지 보내기");
         kakaoMessageService.sendOrderMemo(event.accessToken(), event.order());
-        System.out.println("✅ 주문 성공 후 메시지 보내기 완료");
     }
 }

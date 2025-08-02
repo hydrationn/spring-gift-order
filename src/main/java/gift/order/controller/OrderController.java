@@ -25,12 +25,11 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<OrderResponseDto> createOrder(
-            @RequestHeader("Authorization") String accessToken,
             @LoginMember AuthenticatedMemberDto loginMember,
+            @CookieValue("kakaoAccessToken") String kakaoAccessToken,
             @RequestBody @Valid OrderRequestDto orderRequestDto
     ) {
-        Long memberId = loginMember.id();
-        OrderResponseDto response = orderService.createOrder(memberId, orderRequestDto, accessToken);
+        OrderResponseDto response = orderService.createOrder(loginMember.id(), orderRequestDto, kakaoAccessToken);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

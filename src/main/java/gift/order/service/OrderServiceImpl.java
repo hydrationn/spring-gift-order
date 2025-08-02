@@ -50,7 +50,6 @@ public class OrderServiceImpl implements OrderService {
 
         wishRepository.deleteByOption(opt);
 
-        System.out.println("✅ 주문 성공");
         applicationEventPublisher.publishEvent(new OrderCreatedEvent(memberId, order, accessToken));
 
         return new OrderResponseDto(
